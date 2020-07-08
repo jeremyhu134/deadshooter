@@ -1,0 +1,20 @@
+const config = {
+  type: Phaser.AUTO,
+  width: 1224,
+  height: 600,
+  backgroundColor: "a9a9a9",
+    physics: {
+        default: 'arcade',
+        arcade: {
+          gravity: { y: 500 },
+          enableBody: true,
+        }
+    },
+  scene:[StartScene, GameScene]
+};
+
+const game = new Phaser.Game(config);
+
+let gameState = {
+    active: true
+}
