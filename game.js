@@ -10,11 +10,12 @@ const config = {
           enableBody: true,
         }
     },
-  scene:[StartScene, GameScene]
+  scene:[StartScene, Level1]
 };
 
 const game = new Phaser.Game(config);
 
 let gameState = {
-    active: true
+    active: true,
+    over: false
 }

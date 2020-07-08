@@ -1,7 +1,7 @@
     
-    class GameScene extends Phaser.Scene {
+    class Level1 extends Phaser.Scene {
         constructor() {
-            super({ key: 'GameScene' })
+            super({ key: 'Level1' })
         }
         preload(){
             this.load.image('codey','assets/avatar.png');
@@ -11,10 +11,10 @@
         }
         create(){
             //groups
-            const platforms = this.physics.add.staticGroup();
+            gameState.platforms = this.physics.add.staticGroup();
             gameState.bugRepellent = this.physics.add.group();
             gameState.bug = this.physics.add.group();
-            platforms.create(600, 500, 'platform').setScale(2).refreshBody(0);
+            gameState.platforms.create(600, 500, 'platform').setScale(2).refreshBody(0);
             gameState.cursors = this.input.keyboard.createCursorKeys(); 
             gameState.codey = this.physics.add.sprite(200, 300, 'codey').setOrigin(0,0);
             gameState.codey.setCollideWorldBounds(true);
@@ -24,27 +24,32 @@
             gameState.codey.body.checkCollision.up = true;
             gameState.codey.body.checkCollision.down = true;
             for (var i = 5; i>0; i--){
-                gameState.bug.create(Math.ceil(Math.random()*1000),0,'bug').setScale(1.5);
+                gameState.bug.create(Math.ceil(Math.random()*450+600),0,'bug').setScale(1.5);
             }
-            this.physics.add.collider(gameState.codey, platforms);
-            this.physics.add.collider(gameState.bug, platforms);
+            this.physics.add.collider(gameState.codey, gameState.platforms);
+            this.physics.add.collider(gameState.bug, gameState.platforms);
             this.physics.add.collider(gameState.bug, gameState.bugRepellent, function(bug,bullet) {
                 bug.destroy();
                 bullet.destroy();
             }); 
             this.physics.add.collider(gameState.codey,gameState.bug, ()=>{
                 this.physics.pause();
-                this.add.text(600, 250, 'GAME OVER!', { fontSize: '15px', fill: '#000000' });
+                gameState.over = true;
+                this.add.text(575, 250, 'GAME OVER!', { fontSize: '15px', fill: '#000000' });
                 this.add.text(550, 350, 'Click to restart!', { fontSize: '15px', fill: '#000000' });
-                gameState.active = false;
             });
-            //this.add.text(500, 20, 'Click anywhere to spawn a zombie!', { fontSize: '15px', fill: '#000000' });
+            this.add.text(600, 20, 'Level 1', { fontSize: '15px', fill: '#000000' });
         }
 
         update(){
             this.input.on('pointerup', () => {
-                if(gameState.active === false){
+                if(gameState.over === true){
                     this.scene.restart();
+                    gameState.over = false;
+                }
+                if(gameState.active === false){
+                    this.scene.stop('Level1');
+			        this.scene.start('StartScene');
                     gameState.active = true;
                 }   
                 /*else {
@@ -65,8 +70,8 @@
                 }
             });
             if(gameState.bug.getChildren().length === 0){
-                this.add.text(600, 250, 'YOU WIN!', { fontSize: '15px', fill: '#000000' });
-                this.add.text(550, 350, 'Click to restart!', { fontSize: '15px', fill: '#000000' });
+                this.add.text(570, 250, 'Level Complete!', { fontSize: '15px', fill: '#000000' });
+                this.add.text(550, 350, 'Click to go to menu!', { fontSize: '15px', fill: '#000000' });
                 gameState.active = false;
             }  
             if (Phaser.Input.Keyboard.JustDown(gameState.cursors.space)) {
