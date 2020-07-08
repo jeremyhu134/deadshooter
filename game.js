@@ -17,5 +17,9 @@ const game = new Phaser.Game(config);
 
 let gameState = {
     active: true,
-    over: false
+    over: false,
+    ammo: 10,
+    reset: function (){
+        gameState.ammo = 10;
+    }
 }
