@@ -83,10 +83,10 @@
             }  
             if (Phaser.Input.Keyboard.JustDown(gameState.cursors.space) && gameState.ammo > 0) {
                 if(gameState.codey.flipX === false){
-                    gameState.bugRepellent.create(gameState.codey.x+25,gameState.codey.y+25,'bugRepellent').setGravityY(-500).setVelocityX(800);
+                    gameState.bugRepellent.create(gameState.codey.x,gameState.codey.y,'bugRepellent').setGravityY(-500).setVelocityX(800);
                 }
                 else if(gameState.codey.flipX === true){
-                    gameState.bugRepellent.create(gameState.codey.x+25,gameState.codey.y+25,'bugRepellent').setGravityY(-500).setVelocityX(-800);
+                    gameState.bugRepellent.create(gameState.codey.x,gameState.codey.y,'bugRepellent').setGravityY(-500).setVelocityX(-800);
                 }
                 gameState.ammo -= 1;
                 gameState.ammoText.destroy();
