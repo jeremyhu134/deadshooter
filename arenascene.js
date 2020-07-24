@@ -39,6 +39,8 @@ class ArenaScene extends Phaser.Scene {
         this.load.image('healthbar','images/healthbar.png');
     }
     create(){
+        gameState.score = 0;
+        gameState.enemyscore = 0;
         gameState.input=this.input;
         gameState.mouse=this.input.mousePointer;
         this.add.image(0,0,'arenabg').setOrigin(0,0);
@@ -130,11 +132,13 @@ class ArenaScene extends Phaser.Scene {
             loop: true
         });
         //gameState.heroimage.play(`${gameState.hero}walk`);
+        gameState.scoretext = this.add.text(560,50,`${gameState.enemyscore} - ${gameState.score}`, { fontSize: '40px', fill: '#000000' });
     }
     
     
     update(){
         if(gameState.gameover === false){
+            this.physics.add.collider(gameState.heroimage, gameState.platforms);
             this.physics.add.collider(gameState.primaryammo, gameState.platforms,(primaryammo, platforms)=>{
                 primaryammo.destroy();
             });
@@ -261,8 +265,8 @@ class ArenaScene extends Phaser.Scene {
                         delay: 150,
                         callback: ()=>{
                             gameState.ability1ammo = this.physics.add.sprite(gameState.heroimage.x,gameState.heroimage.y,`${gameState.hero}ability1ammo`).setGravityY(-1000);
-                            this.physics.moveTo(gameState.ability1ammo,gameState.enemyheroimage.x,gameState.enemyheroimage.y,1500);
-                            gameState.angle1=Phaser.Math.Angle.Between(gameState.ability1ammo.x,gameState.ability1ammo.y,gameState.input.x,gameState.input.y);
+                            this.physics.moveTo(gameState.ability1ammo,gameState.enemyheroimage.x,gameState.enemyheroimage.y,600);
+                            gameState.angle1=Phaser.Math.Angle.Between(gameState.ability1ammo.x,gameState.ability1ammo.y,gameState.enemyheroimage.x,gameState.enemyheroimage.y);
                             gameState.ability1ammo.setRotation(gameState.angle1);
                         },  
                         startAt: 0,
@@ -311,26 +315,35 @@ class ArenaScene extends Phaser.Scene {
             else if(gameState.heroimage.x < gameState.enemyheroimage.x){
                 gameState.enemyheroimage.flipX = true;
             }
-            this.physics.add.collider(gameState.enemyprimaryammo, gameState.heroimage,(ammo, hero)=>{
+            this.physics.add.overlap(gameState.enemyprimaryammo, gameState.heroimage,(ammo, hero)=>{
                 ammo.destroy();
                 gameState.currenthealth -= gameState.enemyprimarydamage;
                 gameState.healthtext.destroy();
                 gameState.healthtext = this.add.text(1155, 70, `${gameState.currenthealth}/${gameState.health}`, { fontSize: '25px', fill: '#FF6347' });
             });
-            this.physics.add.collider(gameState.primaryammo, gameState.enemyheroimage,(ammo, hero)=>{
+            this.physics.add.overlap(gameState.primaryammo, gameState.enemyheroimage,(ammo, hero)=>{
                 ammo.destroy();
                 gameState.enemycurrenthealth -= gameState.primarydamage;
                 gameState.enemyhealthtext.destroy();
                 gameState.enemyhealthtext = this.add.text(30, 70, `${gameState.enemycurrenthealth}/${gameState.enemyhealth}`, { fontSize: '25px', fill: '#FF6347' });
             });
-            this.physics.add.collider(gameState.ability1ammo, gameState.enemyheroimage,(ammo, hero)=>{
+            this.physics.add.overlap(gameState.ability1ammo, gameState.enemyheroimage,(ammo, hero)=>{
                 ammo.destroy();
                 gameState.enemycurrenthealth -= gameState.ability1damage;
                 gameState.enemyhealthtext.destroy();
                 gameState.enemyhealthtext = this.add.text(30, 70, `${gameState.enemycurrenthealth}/${gameState.enemyhealth}`, { fontSize: '25px', fill: '#FF6347' });
             });
-            this.physics.add.collider(gameState.enemyprimaryammo, gameState.platforms,(ammo, hero)=>{
+            this.physics.add.overlap(gameState.enemyprimaryammo, gameState.platforms, (ammo,platform)=> {
                 ammo.destroy();
+            });
+            this.physics.add.overlap(gameState.enemyability1ammo, gameState.platforms, (ammo,platform)=> {
+                ammo.destroy();
+            });
+            this.physics.add.overlap(gameState.enemyability1ammo, gameState.heroimage,(ammo, hero)=>{
+                ammo.destroy();
+                gameState.currenthealth -= gameState.enemyability1damage;
+                gameState.healthtext.destroy();
+                gameState.healthtext = this.add.text(1155, 70, `${gameState.enemycurrenthealth}/${gameState.enemyhealth}`, { fontSize: '25px', fill: '#FF6347' });
             });
             console.log(gameState.enemyreloading);
             if (gameState.enemycurrentprimarycooldown <= 0 && gameState.enemycurrentammo > 0 && gameState.enemyreloading === false) {
@@ -358,8 +371,104 @@ class ArenaScene extends Phaser.Scene {
                     timeScale: 1,
                 });
             };
+            if(gameState.enemyhero === 'ballmech'){
+                if (gameState.enemyheroimage.body.touching.down && gameState.enemycurrentability1cooldown <= 0) {
+                    gameState.enemyheroimage.setVelocityY(-1000);
+                    gameState.enemycurrentability1cooldown = gameState.enemyability1cooldown;
+                }
+            }
+            else if(gameState.enemyhero === 'alientrooper'){
+                if (gameState.enemycurrentability1cooldown <= 0) {
+                    gameState.enemyheroimage.x = gameState.heroimage.x;
+                    gameState.enemyheroimage.y = gameState.heroimage.y;
+                    gameState.enemycurrentability1cooldown = gameState.enemyability1cooldown;
+                }
+            }
+            else if(gameState.enemyhero === 'reconexpert'){
+                if (gameState.enemycurrentability1cooldown <= 0) {
+                   this.time.addEvent({
+                        delay: 20,
+                        callback: ()=>{
+                            gameState.enemyability1ammo = this.physics.add.sprite(gameState.enemyheroimage.x,gameState.enemyheroimage.y,`${gameState.enemyhero}ability1ammo`).setGravityY(-1000).setVelocityX(800);
+                            this.physics.moveTo(gameState.enemyability1ammo,gameState.heroimage.x,gameState.heroimage.y,800);
+                        },  
+                        startAt: 0,
+                        timeScale: 1,
+                        repeat: 15
+                    }); 
+                    gameState.enemycurrentability1cooldown = gameState.enemyability1cooldown;
+                }
+            }
+            else if(gameState.enemyhero === 'goliathhero'){
+                if (gameState.enemycurrentability1cooldown <= 0) {
+                   this.time.addEvent({
+                        delay: 70,
+                        callback: ()=>{
+                            gameState.enemyability1ammo = this.physics.add.sprite(gameState.enemyheroimage.x,gameState.enemyheroimage.y,`${gameState.enemyhero}ability1ammo`).setGravityY(-1000);
+                            this.physics.moveTo(gameState.enemyability1ammo,gameState.heroimage.x,gameState.heroimage.y,650);
+                            gameState.angle4=Phaser.Math.Angle.Between(gameState.enemyability1ammo.x,gameState.enemyability1ammo.y,gameState.heroimage.x,gameState.heroimage.y);
+                            gameState.enemyability1ammo.setRotation(gameState.angle4);
+                        },  
+                        startAt: 0,
+                        timeScale: 1,
+                        repeat: 8
+                    }); 
+                    gameState.enemycurrentability1cooldown = gameState.enemyability1cooldown;
+                }
+            }
+            else if(gameState.enemyhero === 'zaro'){
+                if (gameState.enemycurrentability1cooldown <= 0) {
+                   this.time.addEvent({
+                        delay: 150,
+                        callback: ()=>{
+                            gameState.enemyability1ammo = this.physics.add.sprite(gameState.enemyheroimage.x,gameState.enemyheroimage.y,`${gameState.enemyhero}ability1ammo`).setGravityY(-1000);
+                            this.physics.moveTo(gameState.enemyability1ammo,gameState.heroimage.x,gameState.heroimage.y,600);
+                            gameState.angle4=Phaser.Math.Angle.Between(gameState.enemyability1ammo.x,gameState.enemyability1ammo.y,gameState.heroimage.x,gameState.heroimage.y);
+                            gameState.enemyability1ammo.setRotation(gameState.angle4);
+                        },  
+                        startAt: 0,
+                        timeScale: 1,
+                        repeat: 8
+                    }); 
+                    gameState.enemycurrentability1cooldown = gameState.enemyability1cooldown;
+                }
+            }
         }
         if(gameState.enemycurrenthealth <= 0){
+            gameState.health1 = this.add.image(1155,100,'healthbar').setOrigin(0,0);
+            gameState.health2 = this.add.image(1181,100,'healthbar').setOrigin(0,0);
+            gameState.health3 = this.add.image(1207,100,'healthbar').setOrigin(0,0);
+            gameState.health4 = this.add.image(1233,100,'healthbar').setOrigin(0,0);
+            gameState.enemyheroimage.destroy();
+            gameState.enemyheroimage = this.physics.add.sprite(650, 200, `${gameState.enemyhero}`).setDepth(1).setGravityY(gameState.herogravity);
+            gameState.currenthealth = gameState.health;
+            gameState.enemycurrenthealth = gameState.enemyhealth;
+            gameState.healthtext.destroy();
+            gameState.healthtext = this.add.text(1155, 70, `${gameState.currenthealth}/${gameState.health}`, { fontSize: '25px', fill: '#FF6347' });
+            gameState.enemyhealthtext.destroy();
+            gameState.enemyhealthtext = this.add.text(30, 70, `${gameState.enemycurrenthealth}/${gameState.enemyhealth}`, { fontSize: '25px', fill: '#FF6347' });
+            gameState.score += 1;
+            gameState.scoretext.destroy();
+            gameState.scoretext = this.add.text(560,50,`${gameState.enemyscore} - ${gameState.score}`, { fontSize: '40px', fill: '#000000' });
+        }
+        if(gameState.currenthealth <= 0 ){
+            gameState.health1 = this.add.image(1155,100,'healthbar').setOrigin(0,0);
+            gameState.health2 = this.add.image(1181,100,'healthbar').setOrigin(0,0);
+            gameState.health3 = this.add.image(1207,100,'healthbar').setOrigin(0,0);
+            gameState.health4 = this.add.image(1233,100,'healthbar').setOrigin(0,0);
+            gameState.heroimage.destroy();
+            gameState.heroimage = this.physics.add.sprite(650, 200, `${gameState.hero}`).setDepth(1).setGravityY(gameState.herogravity);
+            gameState.currenthealth = gameState.health;
+            gameState.enemycurrenthealth = gameState.enemyhealth;
+            gameState.healthtext.destroy();
+            gameState.healthtext = this.add.text(1155, 70, `${gameState.currenthealth}/${gameState.health}`, { fontSize: '25px', fill: '#FF6347' });
+            gameState.enemyhealthtext.destroy();
+            gameState.enemyhealthtext = this.add.text(30, 70, `${gameState.enemycurrenthealth}/${gameState.enemyhealth}`, { fontSize: '25px', fill: '#FF6347' });
+            gameState.enemyscore += 1;
+            gameState.scoretext.destroy();
+            gameState.scoretext = this.add.text(560,50,`${gameState.enemyscore} - ${gameState.score}`, { fontSize: '40px', fill: '#000000' });
+        }
+        if(gameState.score === 5){
             this.physics.pause();
             gameState.enemycurrenthealth === 0;
             gameState.enemyhealthtext.destroy();
@@ -368,7 +477,7 @@ class ArenaScene extends Phaser.Scene {
             this.physics.pause();
             gameState.gameover = true;
         }
-        if(gameState.currenthealth <= 0 ){
+        else if(gameState.enemyscore === 5){
             gameState.currenthealth === 0;
             gameState.healthtext.destroy();
             gameState.healthtext = this.add.text(1155, 70, `${gameState.currenthealth}/${gameState.health}`, { fontSize: '25px', fill: '#FF6347' });
