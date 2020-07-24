@@ -8,6 +8,7 @@ class MenuScene extends Phaser.Scene {
         this.load.image('reconexpert','images/reconexpert.png');
         this.load.image('goliathhero','images/goliathhero.png');
         this.load.image('zaro','images/zaro.png');
+        this.load.image('acree','images/acree.png');
         this.load.image('selectionboxes', 'images/selectionboxes.png');
         this.load.image('start','images/start.png');
     }
@@ -20,6 +21,7 @@ class MenuScene extends Phaser.Scene {
         gameState.selectreconexpert = this.add.image(325,305, 'reconexpert').setOrigin(0,0).setInteractive().setScale(0.9);
         gameState.selectgoliath = this.add.image(400,310, 'goliathhero').setOrigin(0,0).setInteractive();
         gameState.selectzaro = this.add.image(485,310, 'zaro').setOrigin(0,0).setInteractive().setScale(1.2);
+        gameState.selectacree = this.add.image(563,305, 'acree').setOrigin(0,0).setInteractive().setScale(1.1);
         var herotext = this.add.text(20,100, '',{ fontSize: '50px', fill: '#000000' });
         gameState.selectballmech.on('pointerdown', () => {
             herotext.destroy();
@@ -50,6 +52,12 @@ class MenuScene extends Phaser.Scene {
             herotext = this.add.text(20,100, 'Selected: Zaro',{ fontSize: '50px', fill: '#000000' });;
             gameState.hero = 'zaro';
             gameState.stats = gameState.zaroStats;
+		});
+        gameState.selectacree.on('pointerdown', () => {
+            herotext.destroy();
+            herotext = this.add.text(20,100, 'Selected: Acree',{ fontSize: '50px', fill: '#000000' });;
+            gameState.hero = 'acree';
+            gameState.stats = gameState.acreeStats;
 		});
         
         var rando = Math.ceil(Math.random()* 5);

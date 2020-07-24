@@ -90,5 +90,19 @@ let gameState = {
         ability1cooldown : 400,
         ability1damage: 30,
         herogravity : 0
+    },
+    acreeStats: {
+        health: 250,
+        ammo : 1,
+        primarydamage: 40,
+        primaryvelocityx: 1000,
+        primaryspread: 1,
+        releadtime : 500,
+        velocityY: -610,
+        velocityX: 240,
+        primarycooldown : 2,
+        ability1cooldown :850,
+        ability1damage: 80,
+        herogravity : 0
     }
 }

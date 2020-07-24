@@ -35,6 +35,11 @@ class ArenaScene extends Phaser.Scene {
         this.load.image('zaroprimaryammo','images/zaroprimaryammo.png');
         this.load.image('zaroability1ammo','images/zaroability1ammo.png');
         this.load.image('zaroability1icon','images/zaroability1icon.png');
+        //Acreeimages
+        this.load.image('acree','images/acree.png');
+        this.load.image('acreeprimaryammo','images/acreeprimaryammo.png');
+        this.load.image('acreeability1ammo','images/acreeability1ammo.png');
+        this.load.image('acreeability1icon','images/acreeability1icon.png');
         
         this.load.image('healthbar','images/healthbar.png');
     }
@@ -206,25 +211,22 @@ class ArenaScene extends Phaser.Scene {
                 gameState.ammotext.destroy();
                 gameState.ammotext = this.add.text(1150, 30, `${gameState.currentammo}/${gameState.ammo}`, { fontSize: '30px', fill: '#696969' });
             }
-            if(gameState.hero === 'ballmech'){
-                if (gameState.keys.SHIFT.isDown && gameState.heroimage.body.touching.down && gameState.currentability1cooldown <= 0) {
+            
+            if (gameState.keys.SHIFT.isDown && gameState.currentability1cooldown <= 0) {
+                if(gameState.hero === 'ballmech'){
                     gameState.heroimage.setVelocityY(-1000);
                     gameState.currentability1cooldown = gameState.ability1cooldown;
                     gameState.ability1icon.destroy;
                     gameState.ability1icon = this.add.image(1170,170,'ability1iconnotready').setOrigin(0,0);
                 }
-            }
-            else if(gameState.hero === 'alientrooper'){
-                if (gameState.keys.SHIFT.isDown && gameState.currentability1cooldown <= 0) {
+                else if(gameState.hero === 'alientrooper'){
                     gameState.heroimage.x = game.input.mousePointer.x;
                     gameState.heroimage.y = game.input.mousePointer.y;
                     gameState.currentability1cooldown = gameState.ability1cooldown;
                     gameState.ability1icon.destroy;
                     gameState.ability1icon = this.add.image(1170,170,'ability1iconnotready').setOrigin(0,0);
                 }
-            }
-            else if(gameState.hero === 'reconexpert'){
-                if (gameState.keys.SHIFT.isDown && gameState.currentability1cooldown <= 0) {
+                else if(gameState.hero === 'reconexpert'){
                    this.time.addEvent({
                         delay: 20,
                         callback: ()=>{
@@ -239,9 +241,7 @@ class ArenaScene extends Phaser.Scene {
                     gameState.ability1icon.destroy;
                     gameState.ability1icon = this.add.image(1170,170,'ability1iconnotready').setOrigin(0,0);
                 }
-            }
-            else if(gameState.hero === 'goliathhero'){
-                if (gameState.keys.SHIFT.isDown && gameState.currentability1cooldown <= 0) {
+                else if(gameState.hero === 'goliathhero'){
                    this.time.addEvent({
                         delay: 70,
                         callback: ()=>{
@@ -258,9 +258,7 @@ class ArenaScene extends Phaser.Scene {
                     gameState.ability1icon.destroy;
                     gameState.ability1icon = this.add.image(1170,170,'ability1iconnotready').setOrigin(0,0);
                 }
-            }
-            else if(gameState.hero === 'zaro'){
-                if (gameState.keys.SHIFT.isDown && gameState.currentability1cooldown <= 0) {
+                else if(gameState.hero === 'zaro'){
                    this.time.addEvent({
                         delay: 150,
                         callback: ()=>{
@@ -277,8 +275,22 @@ class ArenaScene extends Phaser.Scene {
                     gameState.ability1icon.destroy;
                     gameState.ability1icon = this.add.image(1170,170,'ability1iconnotready').setOrigin(0,0);
                 }
+                else if(gameState.hero === 'acree'){
+                   gameState.ability1ammo = this.physics.add.sprite(gameState.heroimage.x,gameState.heroimage.y,`${gameState.hero}ability1ammo`).setGravityY(-1000);
+                    gameState.currentability1cooldown = gameState.ability1cooldown;
+                    gameState.ability1icon.destroy;
+                    gameState.ability1icon = this.add.image(1170,170,'ability1iconnotready').setOrigin(0,0);
+                    this.input.on('pointermove', function (pointer){
+                        this.physics.moveTo(gameState.ability1ammo, gameState.input.x,gameState.input.y, 600);
+                        gameState.angle1=Phaser.Math.Angle.Between(gameState.ability1ammo.x,gameState.ability1ammo.y,gameState.input.x,gameState.input.y);
+                        gameState.ability1ammo.setRotation(gameState.angle1);
+                    }, this);
+                }
             }
             //heromovement
+            if(gameState.keys.W.isDown && gameState.hero === 'acree'&& gameState.heroimage.body.touching.left || gameState.keys.W.isDown && gameState.hero === 'acree'&&gameState.heroimage.body.touching.right){
+               gameState.heroimage.setVelocityY(gameState.velocityY);
+            }
             if(gameState.keys.W.isDown && gameState.heroimage.body.touching.down){
                gameState.heroimage.setVelocityY(gameState.velocityY);
             }
