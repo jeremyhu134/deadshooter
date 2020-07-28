@@ -9,6 +9,8 @@ class MenuScene extends Phaser.Scene {
         this.load.image('goliathhero','images/goliathhero.png');
         this.load.image('zaro','images/zaro.png');
         this.load.image('acree','images/acree.png');
+        this.load.image('theadmin','images/theadmin.png');
+        this.load.image('lucio','images/lucio.png');
         this.load.image('selectionboxes', 'images/selectionboxes.png');
         this.load.image('start','images/start.png');
     }
@@ -22,6 +24,8 @@ class MenuScene extends Phaser.Scene {
         gameState.selectgoliath = this.add.image(400,310, 'goliathhero').setOrigin(0,0).setInteractive();
         gameState.selectzaro = this.add.image(485,310, 'zaro').setOrigin(0,0).setInteractive().setScale(1.2);
         gameState.selectacree = this.add.image(563,305, 'acree').setOrigin(0,0).setInteractive().setScale(1.1);
+        gameState.selecttheadmin = this.add.image(645,304, 'theadmin').setOrigin(0,0).setInteractive();
+        gameState.selectlucio = this.add.image(733,310, 'lucio').setOrigin(0,0).setInteractive().setScale(0.8);
         var herotext = this.add.text(20,100, '',{ fontSize: '50px', fill: '#000000' });
         gameState.selectballmech.on('pointerdown', () => {
             herotext.destroy();
@@ -59,8 +63,20 @@ class MenuScene extends Phaser.Scene {
             gameState.hero = 'acree';
             gameState.stats = gameState.acreeStats;
 		});
+        gameState.selecttheadmin.on('pointerdown', () => {
+            herotext.destroy();
+            herotext = this.add.text(20,100, 'Selected: The ADMIN',{ fontSize: '50px', fill: '#000000' });;
+            gameState.hero = 'theadmin';
+            gameState.stats = gameState.theadminStats;
+		});
+        gameState.selectlucio.on('pointerdown', () => {
+            herotext.destroy();
+            herotext = this.add.text(20,100, 'Selected: Lucio',{ fontSize: '50px', fill: '#000000' });;
+            gameState.hero = 'lucio';
+            gameState.stats = gameState.lucioStats;
+		});
         
-        var rando = Math.ceil(Math.random()* 5);
+        var rando = Math.ceil(Math.random()* 8);
         console.log(rando);
         if(rando === 1){
             gameState.enemyhero = 'ballmech';
@@ -81,6 +97,14 @@ class MenuScene extends Phaser.Scene {
         else if(rando === 5){
             gameState.enemyhero = 'zaro';
             gameState.enemyherostats = gameState.zaroStats;
+        }
+        else if(rando === 6 || rando === 7){
+            gameState.enemyhero = 'acree';
+            gameState.enemyherostats = gameState.acreeStats;
+        }
+        else if(rando === 8){
+            gameState.enemyhero = 'lucio';
+            gameState.enemyherostats = gameState.lucioStats;
         }
         gameState.enemyhealth = gameState.enemyherostats.health;
         gameState.enemyammo = gameState.enemyherostats.ammo;

@@ -40,6 +40,17 @@ class ArenaScene extends Phaser.Scene {
         this.load.image('acreeprimaryammo','images/acreeprimaryammo.png');
         this.load.image('acreeability1ammo','images/acreeability1ammo.png');
         this.load.image('acreeability1icon','images/acreeability1icon.png');
+        //TheADMINImages
+        this.load.image('theadmin','images/theadmin.png');
+        this.load.image('theadminprimaryammo','images/theadminprimaryammo.png');
+        this.load.image('theadminability1ammo','images/theadminprimaryammo.png');
+        this.load.image('theadminability1icon','images/theadminability1icon.png');
+        this.load.image('theadminturret','images/theadminturret.png');
+        //LucioImages
+        this.load.image('lucio','images/lucio.png');
+        this.load.image('lucioprimaryammo','images/lucioprimaryammo.png');
+        this.load.image('lucioability1icon','images/lucioability1icon.png');
+        
         
         this.load.image('healthbar','images/healthbar.png');
     }
@@ -67,7 +78,7 @@ class ArenaScene extends Phaser.Scene {
         gameState.platforms.create(1270, 0, 'sideplatform').setOrigin(0,0).refreshBody(0);
         gameState.cursors = this.input.keyboard.createCursorKeys(); 
         //hero
-        gameState.heroimage = this.physics.add.sprite(100, 550, `${gameState.hero}`).setDepth(1).setGravityY(gameState.herogravity);
+        gameState.heroimage = this.physics.add.sprite(100, 550, `${gameState.hero}`).setDepth(1).setGravityY(gameState.herogravity).setBounce(0.2);
         gameState.heroimage.body.checkCollision.right = true;
         gameState.heroimage.body.checkCollision.left = true;
         gameState.heroimage.body.checkCollision.up = true;
@@ -197,34 +208,50 @@ class ArenaScene extends Phaser.Scene {
 
             //shooting button
             if (gameState.mouse.isDown&& gameState.currentprimarycooldown <= 0 && gameState.currentammo > 0 && gameState.reloading === false) {
-                gameState.primaryammo = this.physics.add.sprite(gameState.heroimage.x,gameState.heroimage.y,`${gameState.hero}primaryammo`).setGravityY(-1000);
-                gameState.angle=Phaser.Math.Angle.Between(gameState.primaryammo.x,gameState.primaryammo.y,gameState.input.x,gameState.input.y);
-                if(gameState.input.x < gameState.heroimage.x && gameState.input.y < gameState.heroimage.y || gameState.input.x > gameState.heroimage.x && gameState.input.y > gameState.heroimage.y){
-                    this.physics.moveTo(gameState.primaryammo,Math.ceil(Math.random() * -(gameState.primaryspread))+gameState.input.x,Math.ceil(Math.random() * -(gameState.primaryspread))+gameState.input.y,gameState.primaryvelocityx);
+                if(gameState.hero === 'lucio'){
+                    this.time.addEvent({
+                        delay: 50,
+                        callback: ()=>{
+                            gameState.primaryammo = this.physics.add.sprite(gameState.heroimage.x,gameState.heroimage.y,`${gameState.hero}primaryammo`).setGravityY(-1000);
+                           this.physics.moveTo(gameState.primaryammo,gameState.input.x, gameState.input.y,gameState.primaryvelocityx); gameState.angle=Phaser.Math.Angle.Between(gameState.primaryammo.x,gameState.primaryammo.y,gameState.input.x,gameState.input.
+                           y);
+                            gameState.primaryammo.setRotation(gameState.angle);
+                            gameState.currentammo -= 1;
+                            gameState.ammotext.destroy();
+                            gameState.ammotext = this.add.text(1150, 30, `${gameState.currentammo}/${gameState.ammo}`, { fontSize: '30px', fill: '#696969' });
+                        },  
+                        startAt: 0,
+                        timeScale: 1,
+                        repeat : 3
+                    });
                 }
                 else {
-                    this.physics.moveTo(gameState.primaryammo,Math.ceil(Math.random() * gameState.primaryspread)+gameState.input.x,Math.ceil(Math.random() * -(gameState.primaryspread))+gameState.input.y,gameState.primaryvelocityx);
+                    gameState.primaryammo = this.physics.add.sprite(gameState.heroimage.x,gameState.heroimage.y,`${gameState.hero}primaryammo`).setGravityY(-1000);
+                    gameState.angle=Phaser.Math.Angle.Between(gameState.primaryammo.x,gameState.primaryammo.y,gameState.input.x,gameState.input.y);
+                    if(gameState.input.x < gameState.heroimage.x && gameState.input.y < gameState.heroimage.y || gameState.input.x > gameState.heroimage.x && gameState.input.y > gameState.heroimage.y){
+                        this.physics.moveTo(gameState.primaryammo,Math.ceil(Math.random() * -(gameState.primaryspread))+gameState.input.x,Math.ceil(Math.random() * -(gameState.primaryspread))+gameState.input.y,gameState.primaryvelocityx);
+                    }
+                    else {
+                        this.physics.moveTo(gameState.primaryammo,Math.ceil(Math.random() * gameState.primaryspread)+gameState.input.x,Math.ceil(Math.random() * -(gameState.primaryspread))+gameState.input.y,gameState.primaryvelocityx);
+                    }
+                    gameState.primaryammo.setRotation(gameState.angle);
+                    gameState.currentammo -= 1;
                 }
-                gameState.primaryammo.setRotation(gameState.angle);
                 gameState.currentprimarycooldown = gameState.primarycooldown;
-                gameState.currentammo -= 1;
-                gameState.ammotext.destroy();
+                 gameState.ammotext.destroy();
                 gameState.ammotext = this.add.text(1150, 30, `${gameState.currentammo}/${gameState.ammo}`, { fontSize: '30px', fill: '#696969' });
             }
             
             if (gameState.keys.SHIFT.isDown && gameState.currentability1cooldown <= 0) {
+                gameState.currentability1cooldown = gameState.ability1cooldown;
+                gameState.ability1icon.destroy;
+                gameState.ability1icon = this.add.image(1170,170,'ability1iconnotready').setOrigin(0,0);
                 if(gameState.hero === 'ballmech'){
                     gameState.heroimage.setVelocityY(-1000);
-                    gameState.currentability1cooldown = gameState.ability1cooldown;
-                    gameState.ability1icon.destroy;
-                    gameState.ability1icon = this.add.image(1170,170,'ability1iconnotready').setOrigin(0,0);
                 }
                 else if(gameState.hero === 'alientrooper'){
                     gameState.heroimage.x = game.input.mousePointer.x;
                     gameState.heroimage.y = game.input.mousePointer.y;
-                    gameState.currentability1cooldown = gameState.ability1cooldown;
-                    gameState.ability1icon.destroy;
-                    gameState.ability1icon = this.add.image(1170,170,'ability1iconnotready').setOrigin(0,0);
                 }
                 else if(gameState.hero === 'reconexpert'){
                    this.time.addEvent({
@@ -237,9 +264,6 @@ class ArenaScene extends Phaser.Scene {
                         timeScale: 1,
                         repeat: 15
                     }); 
-                    gameState.currentability1cooldown = gameState.ability1cooldown;
-                    gameState.ability1icon.destroy;
-                    gameState.ability1icon = this.add.image(1170,170,'ability1iconnotready').setOrigin(0,0);
                 }
                 else if(gameState.hero === 'goliathhero'){
                    this.time.addEvent({
@@ -254,9 +278,6 @@ class ArenaScene extends Phaser.Scene {
                         timeScale: 1,
                         repeat: 8
                     }); 
-                    gameState.currentability1cooldown = gameState.ability1cooldown;
-                    gameState.ability1icon.destroy;
-                    gameState.ability1icon = this.add.image(1170,170,'ability1iconnotready').setOrigin(0,0);
                 }
                 else if(gameState.hero === 'zaro'){
                    this.time.addEvent({
@@ -271,24 +292,68 @@ class ArenaScene extends Phaser.Scene {
                         timeScale: 1,
                         repeat: 8
                     }); 
-                    gameState.currentability1cooldown = gameState.ability1cooldown;
-                    gameState.ability1icon.destroy;
-                    gameState.ability1icon = this.add.image(1170,170,'ability1iconnotready').setOrigin(0,0);
                 }
                 else if(gameState.hero === 'acree'){
                    gameState.ability1ammo = this.physics.add.sprite(gameState.heroimage.x,gameState.heroimage.y,`${gameState.hero}ability1ammo`).setGravityY(-1000);
-                    gameState.currentability1cooldown = gameState.ability1cooldown;
-                    gameState.ability1icon.destroy;
-                    gameState.ability1icon = this.add.image(1170,170,'ability1iconnotready').setOrigin(0,0);
                     this.input.on('pointermove', function (pointer){
                         this.physics.moveTo(gameState.ability1ammo, gameState.input.x,gameState.input.y, 600);
                         gameState.angle1=Phaser.Math.Angle.Between(gameState.ability1ammo.x,gameState.ability1ammo.y,gameState.input.x,gameState.input.y);
                         gameState.ability1ammo.setRotation(gameState.angle1);
                     }, this);
                 }
+                else if(gameState.hero === 'theadmin'){
+                    if(gameState.theadminturret){
+                        gameState.theadminturret.destroy();
+                    }
+                   gameState.theadminturret = this.physics.add.sprite(gameState.heroimage.x,gameState.heroimage.y,`${gameState.hero}turret`).setGravityY(-1000);
+                    this.physics.moveTo(gameState.theadminturret, gameState.input.x,gameState.input.y, 600);
+                    this.physics.add.collider(gameState.theadminturret, gameState.platforms,(turret, platforms)=>{
+                        turret.setVelocity(0);
+                        if(gameState.turretattack){
+                            gameState.turretattack.destroy();
+                        }
+                        gameState.turretattack = this.time.addEvent({
+                            delay: 400,
+                            callback: ()=>{
+                                gameState.ability1ammo = this.physics.add.sprite(gameState.theadminturret.x,gameState.theadminturret.y,`${gameState.hero}ability1ammo`).setGravityY(-1000).setScale(0.8);
+                                this.physics.moveTo(gameState.ability1ammo,gameState.enemyheroimage.x,gameState.enemyheroimage.y,550);
+                                gameState.angle1=Phaser.Math.Angle.Between(gameState.ability1ammo.x,gameState.ability1ammo.y,gameState.enemyheroimage.x,gameState.enemyheroimage.y);
+                                gameState.ability1ammo.setRotation(gameState.angle1);
+                            },  
+                            startAt: 0,
+                            timeScale: 1,
+                            loop : true
+                        }); 
+                    });
+                }
+                else if(gameState.hero === 'lucio'){
+                    gameState.velocityX = gameState.stats.velocityX + 175;
+                    this.time.addEvent({
+                        delay: 5000,
+                        callback: ()=>{
+                            gameState.velocityX = gameState.stats.velocityX;
+                        },  
+                        startAt: 0,
+                        timeScale: 1
+                    }); 
+                }
             }
+            this.physics.add.overlap(gameState.enemyprimaryammo, gameState.theadminturret,(ammo, turret)=>{
+                turret.destroy();
+                ammo.destroy();
+                if(gameState.turretattack){
+                    gameState.turretattack.destroy();
+                }
+                turret = false;
+            });
+            this.physics.add.collider(gameState.primaryammo, gameState.platforms,(primaryammo, platforms)=>{
+                primaryammo.destroy();
+            });
             //heromovement
             if(gameState.keys.W.isDown && gameState.hero === 'acree'&& gameState.heroimage.body.touching.left || gameState.keys.W.isDown && gameState.hero === 'acree'&&gameState.heroimage.body.touching.right){
+               gameState.heroimage.setVelocityY(-500);
+            }
+            else if(gameState.keys.W.isDown && gameState.hero === 'lucio'&& gameState.heroimage.body.touching.left || gameState.keys.W.isDown && gameState.hero === 'lucio'&&gameState.heroimage.body.touching.right){
                gameState.heroimage.setVelocityY(gameState.velocityY);
             }
             if(gameState.keys.W.isDown && gameState.heroimage.body.touching.down){
@@ -357,17 +422,33 @@ class ArenaScene extends Phaser.Scene {
                 gameState.healthtext.destroy();
                 gameState.healthtext = this.add.text(1155, 70, `${gameState.enemycurrenthealth}/${gameState.enemyhealth}`, { fontSize: '25px', fill: '#FF6347' });
             });
-            console.log(gameState.enemyreloading);
             if (gameState.enemycurrentprimarycooldown <= 0 && gameState.enemycurrentammo > 0 && gameState.enemyreloading === false) {
-                gameState.enemyprimaryammo = this.physics.add.sprite(gameState.enemyheroimage.x,gameState.enemyheroimage.y,`${gameState.enemyhero}primaryammo`).setGravityY(-1000);
-                gameState.angle2=Phaser.Math.Angle.Between(gameState.enemyprimaryammo.x,gameState.enemyprimaryammo.y,gameState.heroimage.x,gameState.heroimage.y);
-                if(gameState.heroimage.x < gameState.enemyheroimage.x && gameState.heroimage.y < gameState.enemyheroimage.y || gameState.enemyheroimage.x > gameState.enemyheroimage.x && gameState.heroimage.y > gameState.enemyheroimage.y){
-                    this.physics.moveTo(gameState.enemyprimaryammo,Math.ceil(Math.random() * -(gameState.primaryspread))+gameState.heroimage.x,Math.ceil(Math.random() * -(gameState.primaryspread))+gameState.heroimage.y,gameState.enemyprimaryvelocityx);
+                if(gameState.enemyhero === 'lucio'){
+                    this.time.addEvent({
+                        delay: 50,
+                        callback: ()=>{
+                            gameState.enemyprimaryammo = this.physics.add.sprite(gameState.enemyheroimage.x,gameState.enemyheroimage.y,`${gameState.enemyhero}primaryammo`).setGravityY(-1000);
+                            gameState.angle2=Phaser.Math.Angle.Between(gameState.enemyprimaryammo.x,gameState.enemyprimaryammo.y,gameState.heroimage.x,gameState.heroimage.y);
+                            gameState.enemyprimaryammo.setRotation(gameState.angle2);
+                            gameState.enemycurrentammo -= 1;
+                            this.physics.moveTo(gameState.enemyprimaryammo,gameState.heroimage.x,+gameState.heroimage.y,gameState.enemyprimaryvelocityx);
+                        },  
+                        startAt: 0,
+                        timeScale: 1,
+                        repeat : 3
+                    });
                 }
                 else {
-                    this.physics.moveTo(gameState.enemyprimaryammo,Math.ceil(Math.random() * gameState.enemyprimaryspread)+gameState.heroimage.x,Math.ceil(Math.random() * -(gameState.enemyprimaryspread))+gameState.heroimage.y,gameState.enemyprimaryvelocityx);
+                    gameState.enemyprimaryammo = this.physics.add.sprite(gameState.enemyheroimage.x,gameState.enemyheroimage.y,`${gameState.enemyhero}primaryammo`).setGravityY(-1000);
+                    gameState.angle2=Phaser.Math.Angle.Between(gameState.enemyprimaryammo.x,gameState.enemyprimaryammo.y,gameState.heroimage.x,gameState.heroimage.y);
+                    if(gameState.heroimage.x < gameState.enemyheroimage.x && gameState.heroimage.y < gameState.enemyheroimage.y || gameState.enemyheroimage.x > gameState.enemyheroimage.x && gameState.heroimage.y > gameState.enemyheroimage.y){
+                        this.physics.moveTo(gameState.enemyprimaryammo,Math.ceil(Math.random() * -(gameState.primaryspread))+gameState.heroimage.x,Math.ceil(Math.random() * -(gameState.primaryspread))+gameState.heroimage.y,gameState.enemyprimaryvelocityx);
+                    }
+                    else {
+                        this.physics.moveTo(gameState.enemyprimaryammo,Math.ceil(Math.random() * gameState.enemyprimaryspread)+gameState.heroimage.x,Math.ceil(Math.random() * -(gameState.enemyprimaryspread))+gameState.heroimage.y,gameState.enemyprimaryvelocityx);
+                    }
+                    gameState.enemyprimaryammo.setRotation(gameState.angle2);
                 }
-                gameState.enemyprimaryammo.setRotation(gameState.angle2);
                 gameState.enemycurrentprimarycooldown = gameState.enemyprimarycooldown;
                 gameState.enemycurrentammo -= 1;
             }
@@ -445,6 +526,23 @@ class ArenaScene extends Phaser.Scene {
                     gameState.enemycurrentability1cooldown = gameState.enemyability1cooldown;
                 }
             }
+            else if(gameState.enemyhero === 'acree' && gameState.enemycurrentability1cooldown <= 0){
+               gameState.enemyability1ammo = this.physics.add.sprite(gameState.enemyheroimage.x,gameState.enemyheroimage.y,`${gameState.enemyhero}ability1ammo`).setGravityY(-1000);
+                gameState.enemycurrentability1cooldown = gameState.enemyability1cooldown;
+                this.physics.moveTo(gameState.enemyability1ammo, gameState.heroimage.x,gameState.heroimage.y, 600); gameState.angle4=Phaser.Math.Angle.Between(gameState.enemyability1ammo.x,gameState.enemyability1ammo.y,gameState.heroimage.x,gameState.heroimage.y);
+                gameState.enemyability1ammo.setRotation(gameState.angle4);
+            }
+            else if(gameState.enemyhero === 'lucio' && gameState.enemycurrentability1cooldown <= 0){
+                gameState.enemyvelocityX = gameState.enemyherostats.velocityX + 175;
+                this.time.addEvent({
+                    delay: 5000,
+                    callback: ()=>{
+                        gameState.enemyvelocityX = gameState.enemyherostats.velocityX;
+                    },  
+                    startAt: 0,
+                    timeScale: 1
+                }); 
+            }
         }
         if(gameState.enemycurrenthealth <= 0){
             gameState.health1 = this.add.image(1155,100,'healthbar').setOrigin(0,0);
@@ -496,6 +594,19 @@ class ArenaScene extends Phaser.Scene {
             this.add.text(540, 100, `===DEFEAT===`, { fontSize: '30px', fill: '#696969' });
             this.physics.pause();
             gameState.gameover = true;
+        }
+        if(gameState.gameover === true){ 
+            gameState.endgame = this.time.addEvent({
+                delay: 3000,
+                callback: ()=>{
+                    gameState.reset();
+                    gameState.endgame.destroy();
+                    this.scene.stop('ArenaScene');
+                    this.scene.start('MenuScene');
+                },  
+                startAt: 0,
+                timeScale: 1
+            }); 
         }
     }
 }

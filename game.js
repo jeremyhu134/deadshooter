@@ -52,11 +52,11 @@ let gameState = {
         health: 200,
         ammo : 5,
         primarydamage: 50,
-        primaryvelocityx: 3000,
+        primaryvelocityx: 2500,
         primaryspread: 0,
         releadtime : 1800,
         velocityY: -610,
-        velocityX: 250,
+        velocityX: 235,
         primarycooldown : 40,
         ability1cooldown : 200,
         ability1damage: 5,
@@ -66,7 +66,7 @@ let gameState = {
     goliathheroStats: {
         health: 325,
         ammo : 150,
-        primarydamage: 2,
+        primarydamage: 3,
         primaryvelocityx: 600,
         primaryspread: 100,
         releadtime : 1000,
@@ -80,7 +80,7 @@ let gameState = {
     zaroStats: {
         health: 200,
         ammo : 60,
-        primarydamage: 5,
+        primarydamage: 3,
         primaryvelocityx: 850,
         primaryspread: 100,
         releadtime : 2000,
@@ -88,7 +88,7 @@ let gameState = {
         velocityX: 240,
         primarycooldown : 2,
         ability1cooldown : 400,
-        ability1damage: 30,
+        ability1damage: 25,
         herogravity : 0
     },
     acreeStats: {
@@ -97,12 +97,45 @@ let gameState = {
         primarydamage: 40,
         primaryvelocityx: 1000,
         primaryspread: 1,
-        releadtime : 500,
+        releadtime : 600,
         velocityY: -610,
-        velocityX: 240,
+        velocityX: 235,
         primarycooldown : 2,
         ability1cooldown :850,
         ability1damage: 80,
         herogravity : 0
+    },
+    theadminStats: {
+        health: 300,
+        ammo : 10,
+        primarydamage: 25,
+        primaryvelocityx: 700,
+        primaryspread: 1,
+        releadtime : 2000,
+        velocityY: -610,
+        velocityX: 250,
+        primarycooldown : 40,
+        ability1cooldown :500,
+        ability1damage: 10,
+        herogravity : 0
+    },
+    lucioStats: {
+        health: 200,
+        ammo : 20,
+        primarydamage: 20,
+        primaryvelocityx: 800,
+        primaryspread: 1,
+        releadtime : 2000,
+        velocityY: -610,
+        velocityX: 300,
+        primarycooldown : 40,
+        ability1cooldown : 600,
+        ability1damage: 0,
+        herogravity : 0
+    },
+    reset () {
+        gameState.score = 0;
+        gameState.enemyscore = 0;
+        gameState.gameover = false;
     }
 }
