@@ -3,139 +3,180 @@ class MenuScene extends Phaser.Scene {
 		super({ key: 'MenuScene' })
 	}
     preload(){
-        this.load.image('ballmech','images/ballmech.png');
-        this.load.image('alientrooper','images/alientrooper.png');
-        this.load.image('reconexpert','images/reconexpert.png');
-        this.load.image('goliathhero','images/goliathhero.png');
-        this.load.image('zaro','images/zaro.png');
-        this.load.image('acree','images/acree.png');
-        this.load.image('theadmin','images/theadmin.png');
-        this.load.image('lucio','images/lucio.png');
-        this.load.image('selectionboxes', 'images/selectionboxes.png');
-        this.load.image('start','images/start.png');
+        this.load.image('headquarters','tf2images/headquarters.png');
+        this.load.image('nextmissionbutton','tf2images/nextmissionbutton.png');
+        this.load.image('title','tf2images/title.png');
+        this.load.spritesheet('idlemedic','tf2images/idlemedic.png',{frameWidth: 50,frameHeight:80});
+        this.load.spritesheet('idleengineer','tf2images/idleengineer.png',{frameWidth: 50,frameHeight:80});
+        this.load.spritesheet('idlepyro','tf2images/idlepyro.png',{frameWidth: 50,frameHeight:80});
+        this.load.image('idledemoman','tf2images/idledemoman.png');
+        this.load.image('dialoguebox','tf2images/dialoguebox.png');
+        //audio
+        this.load.audio('headquartersm', 'tf2images/headquartersmusic.mp3');
     }
     create() {
-        this.add.text(500,20, 'SELECT YOUR HERO',{ fontSize: '30px', fill: '#000000' });
-        gameState.start = this.add.image(600,600, 'start').setOrigin(0,0).setInteractive();
-        this.add.image(150,300, 'selectionboxes').setOrigin(0,0);
-        gameState.selectballmech = this.add.image(155,305, 'ballmech').setOrigin(0,0).setInteractive().setScale(0.8);
-        gameState.selectalientrooper = this.add.image(245,315, 'alientrooper').setOrigin(0,0).setInteractive();
-        gameState.selectreconexpert = this.add.image(325,305, 'reconexpert').setOrigin(0,0).setInteractive().setScale(0.9);
-        gameState.selectgoliath = this.add.image(400,310, 'goliathhero').setOrigin(0,0).setInteractive();
-        gameState.selectzaro = this.add.image(485,310, 'zaro').setOrigin(0,0).setInteractive().setScale(1.2);
-        gameState.selectacree = this.add.image(563,305, 'acree').setOrigin(0,0).setInteractive().setScale(1.1);
-        gameState.selecttheadmin = this.add.image(645,304, 'theadmin').setOrigin(0,0).setInteractive();
-        gameState.selectlucio = this.add.image(733,310, 'lucio').setOrigin(0,0).setInteractive().setScale(0.8);
-        var herotext = this.add.text(20,100, '',{ fontSize: '50px', fill: '#000000' });
-        gameState.selectballmech.on('pointerdown', () => {
-            herotext.destroy();
-            herotext = this.add.text(20,100, 'Selected: BallMech',{ fontSize: '50px', fill: '#000000' });;
-            gameState.hero = 'ballmech';
-            gameState.stats = gameState.ballmechStats;
-		});
-        gameState.selectalientrooper.on('pointerdown', () => {
-            herotext.destroy();
-            herotext = this.add.text(20,100, 'Selected: AlienTrooper',{ fontSize: '50px', fill: '#000000' });;
-            gameState.hero = 'alientrooper';
-            gameState.stats = gameState.alientrooperStats;
-		});
-        gameState.selectreconexpert.on('pointerdown', () => {
-            herotext.destroy();
-            herotext = this.add.text(20,100, 'Selected: ReconExpert',{ fontSize: '50px', fill: '#000000' });;
-            gameState.hero = 'reconexpert';
-            gameState.stats = gameState.reconexpertStats;
-		});
-        gameState.selectgoliath.on('pointerdown', () => {
-            herotext.destroy();
-            herotext = this.add.text(20,100, 'Selected: Goliath',{ fontSize: '50px', fill: '#000000' });;
-            gameState.hero = 'goliathhero';
-            gameState.stats = gameState.goliathheroStats;
-		});
-        gameState.selectzaro.on('pointerdown', () => {
-            herotext.destroy();
-            herotext = this.add.text(20,100, 'Selected: Zaro',{ fontSize: '50px', fill: '#000000' });;
-            gameState.hero = 'zaro';
-            gameState.stats = gameState.zaroStats;
-		});
-        gameState.selectacree.on('pointerdown', () => {
-            herotext.destroy();
-            herotext = this.add.text(20,100, 'Selected: Acree',{ fontSize: '50px', fill: '#000000' });;
-            gameState.hero = 'acree';
-            gameState.stats = gameState.acreeStats;
-		});
-        gameState.selecttheadmin.on('pointerdown', () => {
-            herotext.destroy();
-            herotext = this.add.text(20,100, 'Selected: The ADMIN',{ fontSize: '50px', fill: '#000000' });;
-            gameState.hero = 'theadmin';
-            gameState.stats = gameState.theadminStats;
-		});
-        gameState.selectlucio.on('pointerdown', () => {
-            herotext.destroy();
-            herotext = this.add.text(20,100, 'Selected: Lucio',{ fontSize: '50px', fill: '#000000' });;
-            gameState.hero = 'lucio';
-            gameState.stats = gameState.lucioStats;
-		});
+        gameState.dialogueover = false;
+        gameState.loadSave();
+        var loopSound = {
+            loop: true,
+            volume: 100
+        }
+        var hqm = this.sound.add('headquartersm');
+        hqm.play(loopSound);
+        this.add.image(0,0,'headquarters').setOrigin(0,0);
+        this.add.image(10,10,'title').setOrigin(0,0);
+        this.anims.create({
+            key: 'medicidle',
+            repeat: -1,
+            frameRate: 5,
+            frames:this.anims.generateFrameNames('idlemedic',{start: 3,end: 0})
+        });
+        this.anims.create({
+            key: 'engineeridle',
+            repeat: -1,
+            frameRate: 5,
+            frames:this.anims.generateFrameNames('idleengineer',{start: 0,end: 3})
+        });
+        this.anims.create({
+            key: 'pyroidle',
+            repeat: -1,
+            frameRate: 5,
+            frames:this.anims.generateFrameNames('idlepyro',{start: 0,end: 3})
+        });
+        var idlemedic = this.add.sprite(400,155,'idlemedic').setOrigin(0,0);
+        idlemedic.anims.play('medicidle',true);
+        var idlemedic = this.add.sprite(280,155,'idleengineer').setOrigin(0,0);
+        idlemedic.anims.play('engineeridle',true);
+        var idlemedic = this.add.sprite(125,183,'idlepyro').setOrigin(0,0);
+        idlemedic.anims.play('pyroidle',true);
+        var idledemoman = this.add.sprite(550,210,'idledemoman').setOrigin(0,0);
         
-        var rando = Math.ceil(Math.random()* 8);
-        console.log(rando);
-        if(rando === 1){
-            gameState.enemyhero = 'ballmech';
-            gameState.enemyherostats = gameState.ballmechStats;
-        }
-        else if(rando === 2){
-            gameState.enemyhero = 'alientrooper';
-            gameState.enemyherostats = gameState.alientrooperStats;
-        }
-        else if(rando === 3){
-            gameState.enemyhero = 'reconexpert';
-            gameState.enemyherostats = gameState.reconexpertStats;
-        }
-        else if(rando === 4){
-            gameState.enemyhero = 'goliathhero';
-            gameState.enemyherostats = gameState.goliathheroStats;
-        }
-        else if(rando === 5){
-            gameState.enemyhero = 'zaro';
-            gameState.enemyherostats = gameState.zaroStats;
-        }
-        else if(rando === 6 || rando === 7){
-            gameState.enemyhero = 'acree';
-            gameState.enemyherostats = gameState.acreeStats;
-        }
-        else if(rando === 8){
-            gameState.enemyhero = 'lucio';
-            gameState.enemyherostats = gameState.lucioStats;
-        }
-        gameState.enemyhealth = gameState.enemyherostats.health;
-        gameState.enemyammo = gameState.enemyherostats.ammo;
-        gameState.enemyprimarydamage = gameState.enemyherostats.primarydamage;
-        gameState.enemyability1damage = gameState.enemyherostats.ability1damage;
-        gameState.enemyreloadtime = gameState.enemyherostats.releadtime;
-        gameState.enemyprimarycooldown = gameState.enemyherostats.primarycooldown;
-        gameState.enemyability1cooldown = gameState.enemyherostats.ability1cooldown;
-        gameState.enemyprimaryvelocityx = gameState.enemyherostats.primaryvelocityx;
-        gameState.enemyvelocityX = gameState.enemyherostats.velocityX;
-        gameState.enemyvelocityY = gameState.enemyherostats.velocityY;
-        gameState.enemyherogravity = gameState.enemyherostats.herogravity;
-        gameState.enemyprimaryspread = gameState.enemyherostats.primaryspread;
-        gameState.start.on('pointerdown', () => {
-            gameState.health = gameState.stats.health;
-            gameState.ammo = gameState.stats.ammo;
-            gameState.reloadtime = gameState.stats.releadtime;
-            gameState.primarydamage = gameState.stats.primarydamage;
-            gameState.primarycooldown = gameState.stats.primarycooldown;
-            gameState.ability1cooldown = gameState.stats.ability1cooldown;
-            gameState.ability1damage = gameState.stats.ability1damage;
-            gameState.primaryvelocityx = gameState.stats.primaryvelocityx;
-            gameState.velocityX = gameState.stats.velocityX;
-            gameState.velocityY = gameState.stats.velocityY;
-            gameState.herogravity = gameState.stats.herogravity;
-            gameState.primaryspread = gameState.stats.primaryspread;
-            this.scene.stop("MenuScene");
-            this.scene.start("ArenaScene");
+        var missionbutton = this.add.image(550,400,'nextmissionbutton').setOrigin(0,0).setInteractive();
+        missionbutton.on('pointerup', () => {
+            if(gameState.dialogueover === true){
+                if(gameState.missionnumber == 1){
+                    hqm.setMute(true);
+                    this.scene.stop('MenuScene');
+                    this.scene.start('IntroScene');
+                }
+                else if(gameState.missionnumber == 2){
+                    hqm.setMute(true);
+                    this.scene.stop('MenuScene');
+                    this.scene.start('Mission2Scene');
+                }
+                else if(gameState.missionnumber == 3){
+                    var newstext = this.add.text(500, 300, `New missions\n coming soon!`, { fontSize: 'bold 30px', fill: '#FFFFFF' });
+                    this.time.addEvent({
+                        delay: 3000,
+                        callback: ()=>{
+                            newstext.destroy();
+                        },  
+                        startAt: 0,
+                        timeScale: 1
+                    }); 
+                }
+                else {
+                    console.log('suc')
+                }
+            }
 		});
+        if(gameState.missionnumber == 2 && gameState.dialogueover === false){
+            gameState.dialoguenumber = 0;
+            gameState.dialogueswitch = 2;
+            gameState.medicdialogue = ['Good job scout, with dustbowl secured we can finally move on\n to our next location!'];
+            gameState.redscoutdialogue = ['Thanks Doc! Those roboheads don\'t know what\'s commin.'];
+            gameState.dialoguebox = this.add.image(50,400,'dialoguebox').setOrigin(0,0);
+            gameState.medictext = this.add.text(65, 445, `RedMedic = ${gameState.medicdialogue[gameState.dialoguenumber]}`, { fontSize: '15px', fill: '#00000' });
+            gameState.dialoguecooldown = 50;
+            gameState.redscouttext = this.add.text(65, 445, ``, { fontSize: '15px', fill: '#00000' });
+            this.time.addEvent({
+                delay: 1,
+                callback: ()=>{
+                    gameState.dialoguecooldown -= 1;
+                },  
+                startAt: 0,
+                timeScale: 1,
+                repeat: -1
+            }); 
+            gameState.dialogue = function(scene){
+                scene.input.on('pointerdown', () => {
+                    if(gameState.dialoguecooldown <= 0 && gameState.dialogueover === false){
+                        if(gameState.dialogueswitch == 1){
+                            gameState.redscouttext.destroy();
+                            gameState.medictext = scene.add.text(65, 445, `RedMedic = ${gameState.medicdialogue[gameState.dialoguenumber]}`, { fontSize: '15px', fill: '#00000' });
+                            gameState.dialogueswitch = 2;
+                        }
+                        else if(gameState.dialogueswitch == 2){
+                            gameState.medictext.destroy();
+                            gameState.scouttext = scene.add.text(65, 445, `RedScout = ${gameState.redscoutdialogue[gameState.dialoguenumber]}`, { fontSize: '15px', fill: '#00000' });
+                            gameState.dialoguenumber += 1;
+                            gameState.dialogueswitch = 1;
+                        }
+                        gameState.dialoguecooldown = 50;
+                    }
+                });
+                if(gameState.dialoguenumber === 1 && gameState.dialogueswitch === 2){
+                    gameState.dialogueover = true;
+                    gameState.scouttext.destroy();
+                    gameState.medictext.destroy();
+                    gameState.dialoguebox.destroy();
+                }
+            }
+        }
+        if(gameState.missionnumber == 3 && gameState.dialogueover === false){
+            gameState.dialoguenumber = 0;
+            gameState.dialogueswitch = 2;
+            gameState.medicdialogue = ['Oooo. Two missions completed! Well done scout. Did those\n robots give any trouble?'];
+            gameState.redscoutdialogue = ['No way those tincans come close to beating me baby.'];
+            gameState.dialoguebox = this.add.image(50,400,'dialoguebox').setOrigin(0,0);
+            gameState.medictext = this.add.text(65, 445, `RedMedic = ${gameState.medicdialogue[gameState.dialoguenumber]}`, { fontSize: '15px', fill: '#00000' });
+            gameState.dialoguecooldown = 50;
+            gameState.redscouttext = this.add.text(65, 445, ``, { fontSize: '15px', fill: '#00000' });
+            this.time.addEvent({
+                delay: 1,
+                callback: ()=>{
+                    gameState.dialoguecooldown -= 1;
+                },  
+                startAt: 0,
+                timeScale: 1,
+                repeat: -1
+            }); 
+            console.log(gameState.dialoguecooldown)
+            gameState.dialogue = function(scene){
+                scene.input.on('pointerdown', () => {
+                    if(gameState.dialoguecooldown <= 0 && gameState.dialogueover === false){
+                        if(gameState.dialogueswitch == 1){
+                            gameState.redscouttext.destroy();
+                            gameState.medictext = scene.add.text(65, 445, `RedMedic = ${gameState.medicdialogue[gameState.dialoguenumber]}`, { fontSize: '15px', fill: '#00000' });
+                            gameState.dialogueswitch = 2;
+                        }
+                        else if(gameState.dialogueswitch == 2){
+                            gameState.medictext.destroy();
+                            gameState.scouttext = scene.add.text(65, 445, `RedScout = ${gameState.redscoutdialogue[gameState.dialoguenumber]}`, { fontSize: '15px', fill: '#00000' });
+                            gameState.dialoguenumber += 1;
+                            gameState.dialogueswitch = 1;
+                        }
+                        gameState.dialoguecooldown = 50;
+                    }
+                });
+                if(gameState.dialoguenumber === 1 && gameState.dialogueswitch === 2){
+                    gameState.dialogueover = true;
+                    gameState.scouttext.destroy();
+                    gameState.medictext.destroy();
+                    gameState.dialoguebox.destroy();
+                }
+            }
+        }
+        else {
+            gameState.dialogueover = true;
+        }
 	}
     update(){
-        
+        if(gameState.dialogueover === false){
+            gameState.dialogue(this);
+        }
+        else {
+            
+        }
     }
 }
